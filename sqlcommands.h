@@ -2,6 +2,7 @@
 
 #include <QString>
 
+/*
 QString InsertConversationSQL = "INSERT INTO ";
 QString InsertMessageSQL = "INSERT INTO";
 QString InsertUserSQL = "INSERT INTO";
@@ -11,3 +12,4 @@ QString GetUserSQL = "SELECT * FROM";
 
 QString GetConversations = "SELECT * FROM";
 QString GetMessages = "SELECT * FROM";
+*/
