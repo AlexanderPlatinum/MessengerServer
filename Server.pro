@@ -7,4 +7,9 @@ CONFIG -= app_bundle
 DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
-    Main.cpp
+    Main.cpp \
+    Application.cpp
+
+HEADERS += \
+    SQLCommands.h \
+    Application.h
