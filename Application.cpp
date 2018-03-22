@@ -51,14 +51,80 @@ void Application::ReadClientDataHandler()
     while ( this->socket->bytesAvailable() > 0 )
     {
         QByteArray buffer = this->socket->readAll();
-
-        qDebug() << buffer;
-
-        this->socket->write( buffer );
+        this->ExecActions( buffer );
     }
 }
 
 void Application::DisconnectHandler()
 {
     this->socket->close();
+}
+
+Actions Application::ParseAction( QString command )
+{
+    return Actions::LoginUser;
+}
+
+void Application::ExecActions( QByteArray data )
+{
+    switch ( this->ParseAction( "" ) )
+    {
+        case Actions::LoginUser:
+            this->LoginUserAction();
+            break;
+
+        case Actions::RegisterUser:
+            this->RegisterUserAction();
+            break;
+
+        case Actions::GetConversations:
+            this->GetConversationsAction();
+            break;
+
+        case Actions::GetMessages:
+            this->GetMessagesAction();
+            break;
+
+        case Actions::CreateConversation:
+            this->CreateConversationAction();
+            break;
+
+        case Actions::SendMessage:
+            this->SendMessageAction();
+            break;
+
+        default:
+            this->socket->write( ACTION_NOT_FOUND );
+            break;
+    }
+}
+
+void Application::LoginUserAction()
+{
+
+}
+
+void Application::RegisterUserAction()
+{
+
+}
+
+void Application::GetConversationsAction()
+{
+
+}
+
+void Application::GetMessagesAction()
+{
+
+}
+
+void Application::CreateConversationAction()
+{
+
+}
+
+void Application::SendMessageAction()
+{
+
 }

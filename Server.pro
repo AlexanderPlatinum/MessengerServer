@@ -12,4 +12,5 @@ SOURCES += \
 
 HEADERS += \
     SQLCommands.h \
-    Application.h
+    Application.h \
+    ErrorMessages.h

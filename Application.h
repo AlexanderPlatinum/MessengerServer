@@ -7,6 +7,20 @@
 #include <iostream>
 
 #include "SQLCommands.h"
+#include "ErrorMessages.h"
+
+enum Actions {
+
+    LoginUser,
+    RegisterUser,
+
+    GetConversations,
+    GetMessages,
+
+    CreateConversation,
+    SendMessage
+
+};
 
 class Application : public QObject
 {
@@ -26,6 +40,16 @@ private:
 
     void SetUpDB ();
     void SetUpTCPServer();
+
+    Actions ParseAction( QString command );
+    void ExecActions( QByteArray data );
+
+    void LoginUserAction ();
+    void RegisterUserAction();
+    void GetConversationsAction();
+    void GetMessagesAction();
+    void CreateConversationAction();
+    void SendMessageAction();
 
 private slots:
 
