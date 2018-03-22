@@ -1,4 +1,3 @@
-#ifndef ERRORMESSAGES_H
-#define ERRORMESSAGES_H
+#pragma once
 
-#endif // ERRORMESSAGES_H
+#define ACTION_NOT_FOUND "{ error: \"Action not found\" }"

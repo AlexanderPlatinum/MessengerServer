@@ -4,7 +4,10 @@
 #include <QSqlDatabase>
 #include <QTcpServer>
 #include <QTcpSocket>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <iostream>
+#include <utility>
 
 #include "SQLCommands.h"
 #include "ErrorMessages.h"
@@ -18,7 +21,9 @@ enum Actions {
     GetMessages,
 
     CreateConversation,
-    SendMessage
+    SendMessage,
+
+    NotFound
 
 };
 
@@ -50,6 +55,8 @@ private:
     void GetMessagesAction();
     void CreateConversationAction();
     void SendMessageAction();
+
+    std::pair<QString, QString> PaseCommand ( QString command );
 
 private slots:
 

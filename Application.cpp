@@ -62,12 +62,42 @@ void Application::DisconnectHandler()
 
 Actions Application::ParseAction( QString command )
 {
-    return Actions::LoginUser;
+    command = command.toUpper();
+
+    if ( command == "LOGIN_USER" )
+        return Actions::LoginUser;
+
+    if ( command == "REGISTER_USER" )
+        return Actions::RegisterUser;
+
+    if ( command == "GET_CONVERSATIONS" )
+        return Actions::GetConversations;
+
+    if ( command == "GET_MESSAGES" )
+        return Actions::GetMessages;
+
+    if ( command == "CREATE_CONVERSATION" )
+        return Actions::CreateConversation;
+
+    if ( command == "SEND_MESSAGE" )
+        return Actions::SendMessage;
+
+    return Actions::NotFound;
+}
+
+std::pair<QString, QString> Application::PaseCommand( QString command )
+{
+    QJsonDocument document = QJsonDocument::fromJson( command.toUtf8() );
+    QJsonObject object = document.object();
+
+    return std::make_pair( object["command"].toString(), object["params"].toString() );
 }
 
 void Application::ExecActions( QByteArray data )
 {
-    switch ( this->ParseAction( "" ) )
+    std::pair<QString, QString> tmp = this->PaseCommand( QString( data ) );
+
+    switch ( this->ParseAction( tmp.first ) )
     {
         case Actions::LoginUser:
             this->LoginUserAction();
