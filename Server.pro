@@ -14,3 +14,6 @@ HEADERS += \
     SQLCommands.h \
     Application.h \
     ErrorMessages.h
+
+DISTFILES += \
+    db.sql

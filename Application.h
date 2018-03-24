@@ -2,10 +2,12 @@
 
 #include <QSql>
 #include <QSqlDatabase>
+#include <QSqlQuery>
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonArray>
 #include <iostream>
 #include <utility>
 
@@ -25,6 +27,14 @@ enum Actions {
 
     NotFound
 
+};
+
+struct User {
+    int id;
+    QString first_name;
+    QString last_name;
+    QString email;
+    QString password;
 };
 
 class Application : public QObject
@@ -49,14 +59,22 @@ private:
     Actions ParseAction( QString command );
     void ExecActions( QByteArray data );
 
-    void LoginUserAction ();
-    void RegisterUserAction();
-    void GetConversationsAction();
-    void GetMessagesAction();
-    void CreateConversationAction();
-    void SendMessageAction();
+    // Actions
+    void LoginUserAction ( QJsonObject params );
+    void RegisterUserAction( QJsonObject params );
+    void GetConversationsAction( QJsonObject params );
+    void GetMessagesAction( QJsonObject params );
+    void CreateConversationAction( QJsonObject params );
+    void SendMessageAction( QJsonObject params );
 
-    std::pair<QString, QString> PaseCommand ( QString command );
+    std::pair<QString, QJsonObject> ParseCommand ( QString command );
+
+    // Execute sql
+    void InsertUser( User user );
+
+    std::pair<bool, QString> CheckSeqId ( QJsonObject params );
+
+    void SendOk ( QString seqId );
 
 private slots:
 

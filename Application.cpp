@@ -18,7 +18,7 @@ void Application::SetUpDB()
 
     if ( !db.open() )
     {
-        qDebug() << "Database error!";;
+        qDebug() << "Database error!";
     }
 }
 
@@ -51,6 +51,7 @@ void Application::ReadClientDataHandler()
     while ( this->socket->bytesAvailable() > 0 )
     {
         QByteArray buffer = this->socket->readAll();
+        qDebug() << buffer;
         this->ExecActions( buffer );
     }
 }
@@ -85,42 +86,42 @@ Actions Application::ParseAction( QString command )
     return Actions::NotFound;
 }
 
-std::pair<QString, QString> Application::PaseCommand( QString command )
+std::pair<QString, QJsonObject> Application::ParseCommand( QString command )
 {
     QJsonDocument document = QJsonDocument::fromJson( command.toUtf8() );
     QJsonObject object = document.object();
 
-    return std::make_pair( object["command"].toString(), object["params"].toString() );
+    return std::make_pair( object["command"].toString(), object["params"].toObject() );
 }
 
 void Application::ExecActions( QByteArray data )
 {
-    std::pair<QString, QString> tmp = this->PaseCommand( QString( data ) );
+    std::pair<QString, QJsonObject> tmp = this->ParseCommand( QString( data ) );
 
     switch ( this->ParseAction( tmp.first ) )
     {
         case Actions::LoginUser:
-            this->LoginUserAction();
+            this->LoginUserAction( tmp.second );
             break;
 
         case Actions::RegisterUser:
-            this->RegisterUserAction();
+            this->RegisterUserAction( tmp.second );
             break;
 
         case Actions::GetConversations:
-            this->GetConversationsAction();
+            this->GetConversationsAction( tmp.second );
             break;
 
         case Actions::GetMessages:
-            this->GetMessagesAction();
+            this->GetMessagesAction( tmp.second );
             break;
 
         case Actions::CreateConversation:
-            this->CreateConversationAction();
+            this->CreateConversationAction( tmp.second );
             break;
 
         case Actions::SendMessage:
-            this->SendMessageAction();
+            this->SendMessageAction( tmp.second );
             break;
 
         default:
@@ -129,32 +130,91 @@ void Application::ExecActions( QByteArray data )
     }
 }
 
-void Application::LoginUserAction()
+std::pair<bool, QString> Application::CheckSeqId ( QJsonObject params )
+{
+    QString seqId = params["seqId"].toString();
+
+    if ( seqId.size() == 0 )
+    {
+        this->socket->write( SEQ_ID_IS_NULL );
+        return std::make_pair( true, "NULL" );
+    }
+
+    return std::make_pair( false, seqId );
+}
+
+void Application::LoginUserAction( QJsonObject params )
 {
 
 }
 
-void Application::RegisterUserAction()
+void Application::RegisterUserAction( QJsonObject params )
+{
+    auto seqId = this->CheckSeqId( params );
+
+    if ( seqId.first )
+    {
+        return;
+    }
+
+    User *user = new User();
+
+    user->first_name = params["first_name"].toString();
+    user->last_name  = params["last_name"].toString();
+    user->email      = params["email"].toString();
+    user->password   = params["password"].toString();
+
+    if ( user->email.size() < 5 )
+    {
+        this->socket->write( EMAIL_NOT_VALID );
+        return;
+    }
+
+    if ( user->password.size() < 6 )
+    {
+        this->socket->write( PASSWORD_NOT_VALID );
+        return;
+    }
+
+    this->InsertUser( *user );
+    this->SendOk( seqId.second );
+}
+
+void Application::GetConversationsAction( QJsonObject params )
 {
 
 }
 
-void Application::GetConversationsAction()
+void Application::GetMessagesAction( QJsonObject params )
 {
 
 }
 
-void Application::GetMessagesAction()
+void Application::CreateConversationAction( QJsonObject params )
 {
 
 }
 
-void Application::CreateConversationAction()
+void Application::SendMessageAction( QJsonObject params )
 {
 
 }
 
-void Application::SendMessageAction()
+void Application::SendOk( QString seqId )
 {
+    this->socket->write( QString("{ \"seqId\" : \"" + seqId + "\", \"msg\": \"OK\" }").toUtf8() );
+}
 
+void Application::InsertUser( User user )
+{
+    QSqlQuery query;
+
+    query.prepare( INSERT_USER_SQL );
+
+    query.bindValue( ":first_name", user.first_name );
+    query.bindValue( ":last_name", user.last_name );
+    query.bindValue( ":email", user.email );
+    query.bindValue( ":password", user.password );
+
+    query.exec();
 }
