@@ -145,7 +145,40 @@ std::pair<bool, QString> Application::CheckSeqId ( QJsonObject params )
 
 void Application::LoginUserAction( QJsonObject params )
 {
+    auto seqId = this->CheckSeqId( params );
 
+    if ( seqId.first )
+    {
+        return;
+    }
+
+    User *user = new User();
+
+    user->email      = params["email"].toString();
+    user->password   = params["password"].toString();
+
+    if ( user->email.size() == 0 || user->password.size() == 0 )
+    {
+        return;
+    }
+
+    QString user_id = this->GetUserByEmailAndPass( *user );
+
+    if ( user_id.size() == 0 )
+    {
+        return;
+    }
+
+    QString token = this->InsertSession( user_id );
+
+    QJsonObject *obj = new QJsonObject();
+
+    obj->insert( "seqId", seqId.second );
+    obj->insert( "msg", "OK" );
+    obj->insert( "token", token );
+
+    QJsonDocument *doc = new QJsonDocument( *obj );
+    this->socket->write( doc->toJson() );
 }
 
 void Application::RegisterUserAction( QJsonObject params )
@@ -217,4 +250,52 @@ void Application::InsertUser( User user )
     query.bindValue( ":password", user.password );
 
     query.exec();
+}
+
+QString Application::GetUserByEmailAndPass( User user )
+{
+    QSqlQuery query;
+
+    query.prepare( GET_USER_ID_BY_EMAIL_PASS );
+
+    query.bindValue( ":email", user.email );
+    query.bindValue( ":password", user.password );
+
+    query.exec();
+
+    while ( query.next() )
+    {
+        return query.value("id").toString();
+    }
+
+    return "";
+}
+
+
+QString Application::InsertSession( QString user_id )
+{
+
+    QString token =  this->randString( 45 );
+    QSqlQuery query;
+
+    query.prepare( INSERT_SESSION_SQL );
+
+    query.bindValue( ":token", token );
+    query.bindValue( ":user_id", user_id );
+
+    query.exec();
+
+    return token;
+}
+
+QString Application::randString(int len)
+{
+    QString str;
+
+    str.resize(len);
+
+    for (int s = 0; s < len ; ++s)
+        str[s] = QChar('A' + char(qrand() % ('Z' - 'A')));
+
+    return str;
 }

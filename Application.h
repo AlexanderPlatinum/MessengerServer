@@ -18,13 +18,10 @@ enum Actions {
 
     LoginUser,
     RegisterUser,
-
     GetConversations,
     GetMessages,
-
     CreateConversation,
     SendMessage,
-
     NotFound
 
 };
@@ -56,7 +53,9 @@ private:
     void SetUpDB ();
     void SetUpTCPServer();
 
+    // Common
     Actions ParseAction( QString command );
+    std::pair<QString, QJsonObject> ParseCommand ( QString command );
     void ExecActions( QByteArray data );
 
     // Actions
@@ -67,14 +66,15 @@ private:
     void CreateConversationAction( QJsonObject params );
     void SendMessageAction( QJsonObject params );
 
-    std::pair<QString, QJsonObject> ParseCommand ( QString command );
-
     // Execute sql
     void InsertUser( User user );
+    QString GetUserByEmailAndPass ( User user );
+    QString InsertSession( QString user_id );
 
+    // Utilities
     std::pair<bool, QString> CheckSeqId ( QJsonObject params );
-
     void SendOk ( QString seqId );
+    QString randString(int len);
 
 private slots:
 
