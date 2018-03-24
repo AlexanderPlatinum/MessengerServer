@@ -14,3 +14,16 @@ CREATE TABLE sessions (
     user_id INTEGER      REFERENCES users (id)
 );
 
+CREATE TABLE conversations (
+    id           INTEGER       PRIMARY KEY AUTOINCREMENT,
+    user_one     INTEGER       REFERENCES users (id),
+    user_two     INTEGER       REFERENCES users (id),
+    last_message VARCHAR (255)
+);
+
+CREATE TABLE messages (
+    id              INTEGER     PRIMARY KEY AUTOINCREMENT,
+    conversation_id INTEGER     REFERENCES conversations (id),
+    author_id       INTEGER     REFERENCES users (id),
+    msg_text        TEXT (4096)
+);

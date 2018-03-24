@@ -68,8 +68,14 @@ private:
 
     // Execute sql
     void InsertUser( User user );
+    void InsertConversation ( QString user_one, QString user_two );
+    void InsertMessage( QString conversation_id, QString author_id, QString message );
+
     QString GetUserByEmailAndPass ( User user );
     QString InsertSession( QString user_id );
+    QString GetUserIdByToken( QString token );
+    QString GetConversations( QString user_id );
+    QString GetMessages( QString conversation_id );
 
     // Utilities
     std::pair<bool, QString> CheckSeqId ( QJsonObject params );

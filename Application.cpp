@@ -215,22 +215,44 @@ void Application::RegisterUserAction( QJsonObject params )
 
 void Application::GetConversationsAction( QJsonObject params )
 {
+    QString user_id = this->GetUserIdByToken( params["token"].toString() );
+
+    if ( user_id.size() == 0 )
+    {
+        return;
+    }
+
 
 }
 
 void Application::GetMessagesAction( QJsonObject params )
 {
+    QString user_id = this->GetUserIdByToken( params["token"].toString() );
 
+    if ( user_id.size() == 0 )
+    {
+        return;
+    }
 }
 
 void Application::CreateConversationAction( QJsonObject params )
 {
+    QString user_id = this->GetUserIdByToken( params["token"].toString() );
 
+    if ( user_id.size() == 0 )
+    {
+        return;
+    }
 }
 
 void Application::SendMessageAction( QJsonObject params )
 {
+    QString user_id = this->GetUserIdByToken( params["token"].toString() );
 
+    if ( user_id.size() == 0 )
+    {
+        return;
+    }
 }
 
 void Application::SendOk( QString seqId )
@@ -271,7 +293,6 @@ QString Application::GetUserByEmailAndPass( User user )
     return "";
 }
 
-
 QString Application::InsertSession( QString user_id )
 {
 
@@ -286,6 +307,104 @@ QString Application::InsertSession( QString user_id )
     query.exec();
 
     return token;
+}
+
+QString Application::GetUserIdByToken( QString token )
+{
+    QSqlQuery query;
+
+    query.prepare( GET_USER_BY_TOKEN_SQL );
+    query.bindValue( ":token", token );
+
+    query.exec();
+
+    while ( query.next() )
+    {
+        return query.value( "user_id" ).toString();
+    }
+
+    return "";
+}
+
+void Application::InsertConversation( QString user_one, QString user_two )
+{
+    QSqlQuery query;
+
+    query.prepare( CREATE_CONVERSATION_SQL );
+
+    query.bindValue( ":user_one", user_one );
+    query.bindValue( ":user_two", user_two );
+
+    query.exec();
+}
+
+void Application::InsertMessage( QString conversation_id, QString author_id, QString message )
+{
+    QSqlQuery query;
+
+    query.prepare( CREATE_MESSAGE_SQL );
+
+    query.bindValue( ":conversation_id", conversation_id );
+    query.bindValue( ":author_id", author_id );
+    query.bindValue( ":msg_text", message );
+
+    query.exec();
+}
+
+QString Application::GetConversations( QString user_id )
+{
+    QSqlQuery query;
+
+    query.prepare( GET_CONVERSATIONS_SQL );
+    query.bindValue( ":user_id", user_id );
+
+    query.exec();
+
+    QJsonArray array;
+
+    while ( query.next() )
+    {
+        QJsonObject obj;
+
+        obj.insert( "conversation_id",  query.value( "id" ).toString() );
+        obj.insert( "u_one_first_name", query.value( "u_one_first_name" ).toString() );
+        obj.insert( "u_one_last_name",  query.value( "u_one_last_name" ).toString() );
+        obj.insert( "u_two_first_name", query.value( "u_two_first_name" ).toString() );
+        obj.insert( "u_two_last_name",  query.value( "u_two_last_name" ).toString() );
+
+        array.push_back( QJsonValue( obj ) );
+    }
+
+    QJsonDocument doc ( array );
+
+    return doc.toJson();
+}
+
+QString Application::GetMessages( QString conversation_id )
+{
+    QSqlQuery query;
+
+    query.prepare( GET_MESSAGES_SQL );
+    query.bindValue( ":conversation_id", conversation_id );
+
+    query.exec();
+
+    QJsonArray array;
+
+    while ( query.next() )
+    {
+        QJsonObject obj;
+
+        obj.insert( "msg_id", query.value( "id" ).toString() );
+        obj.insert( "author_id", query.value( "author_id" ).toString() );
+        obj.insert( "msg_text", query.value( "msg_text" ).toString() );
+
+        array.push_back( QJsonValue( obj ) );
+    }
+
+    QJsonDocument doc( array );
+
+    return doc.toJson();
 }
 
 QString Application::randString(int len)
