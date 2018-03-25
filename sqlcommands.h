@@ -2,6 +2,7 @@
 
 #define INSERT_USER_SQL "INSERT INTO users ( first_name, last_name, email, password ) VALUES ( :first_name, :last_name, :email, :password );"
 #define GET_USER_ID_BY_EMAIL_PASS "SELECT id FROM users WHERE password = :password AND email = :email;"
+#define GET_USERS_SQL " SELECT id, first_name, last_name FROM users;"
 
 #define INSERT_SESSION_SQL "INSERT INTO sessions ( token, user_id ) VALUES ( :token, :user_id );"
 #define GET_USER_BY_TOKEN_SQL "SELECT user_id FROM sessions WHERE token = :token;"

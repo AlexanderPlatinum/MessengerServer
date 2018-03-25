@@ -53,7 +53,6 @@ void Application::ReadClientDataHandler()
     while ( this->socket->bytesAvailable() > 0 )
     {
         QByteArray buffer = this->socket->readAll();
-        qDebug() << buffer;
         this->ExecActions( buffer );
     }
 }
@@ -86,6 +85,9 @@ Actions Application::ParseAction( QString command )
 
     if ( command == "SEND_MESSAGE" )
         return Actions::SendMessage;
+
+    if ( command == "GET_USERS" )
+        return Actions::GetUsers;
 
     return Actions::NotFound;
 }
@@ -126,6 +128,10 @@ void Application::ExecActions( QByteArray data )
 
         case Actions::SendMessage:
             this->SendMessageAction( tmp.second );
+            break;
+
+        case Actions::GetUsers:
+            this->GetUsersAction( tmp.second );
             break;
 
         default:
@@ -335,6 +341,35 @@ void Application::SendMessageAction( QJsonObject params )
     this->SendOk( seqId.second );
 }
 
+void Application::GetUsersAction( QJsonObject params )
+{
+    QString user_id = this->GetUserIdByToken( params["token"].toString() );
+
+    if ( user_id.size() == 0 )
+    {
+        this->socket->write( USER_NOT_AUTHORIZE );
+        return;
+    }
+
+    auto seqId = this->CheckSeqId( params );
+
+    if( seqId.first )
+    {
+        return;
+    }
+
+    QJsonArray users = this->GetAllUsers();
+
+    QJsonObject *obj = new QJsonObject();
+
+    obj->insert( "seqId", seqId.second );
+    obj->insert( "msg", "OK" );
+    obj->insert( "response", QJsonValue( users ) );
+
+    QJsonDocument *doc = new QJsonDocument( *obj );
+    this->socket->write( doc->toJson() );
+}
+
 // Execute sql
 
 void Application::InsertUser( User user )
@@ -473,6 +508,30 @@ QJsonArray Application::GetMessages( QString conversation_id )
         obj.insert( "msg_id", query.value( "id" ).toString() );
         obj.insert( "author_id", query.value( "author_id" ).toString() );
         obj.insert( "msg_text", query.value( "msg_text" ).toString() );
+
+        array.push_back( QJsonValue( obj ) );
+    }
+
+    return array;
+}
+
+QJsonArray Application::GetAllUsers()
+{
+    QSqlQuery query;
+
+    query.prepare( GET_USERS_SQL );
+
+    query.exec();
+
+    QJsonArray array;
+
+    while ( query.next() )
+    {
+        QJsonObject obj;
+
+        obj.insert( "id", query.value( "id" ).toString() );
+        obj.insert( "first_name", query.value( "first_name" ).toString() );
+        obj.insert( "last_name", query.value( "last_name" ).toString() );
 
         array.push_back( QJsonValue( obj ) );
     }

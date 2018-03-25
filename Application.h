@@ -22,6 +22,7 @@ enum Actions {
     GetMessages,
     CreateConversation,
     SendMessage,
+    GetUsers,
     NotFound
 
 };
@@ -65,6 +66,7 @@ private:
     void GetMessagesAction( QJsonObject params );
     void CreateConversationAction( QJsonObject params );
     void SendMessageAction( QJsonObject params );
+    void GetUsersAction( QJsonObject params );
 
     // Execute sql
     void InsertUser( User user );
@@ -76,6 +78,7 @@ private:
     QString GetUserIdByToken( QString token );
     QJsonArray GetConversations( QString user_id );
     QJsonArray GetMessages( QString conversation_id );
+    QJsonArray GetAllUsers();
 
     // Utilities
     std::pair<bool, QString> CheckSeqId ( QJsonObject params );
