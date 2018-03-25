@@ -36,6 +36,8 @@ void Application::SetUpTCPServer()
     }
 }
 
+// Slots
+
 void Application::NewConnectionHandler()
 {
     qDebug() << "New connection";
@@ -60,6 +62,8 @@ void Application::DisconnectHandler()
 {
     this->socket->close();
 }
+
+// Parsers
 
 Actions Application::ParseAction( QString command )
 {
@@ -130,18 +134,7 @@ void Application::ExecActions( QByteArray data )
     }
 }
 
-std::pair<bool, QString> Application::CheckSeqId ( QJsonObject params )
-{
-    QString seqId = params["seqId"].toString();
-
-    if ( seqId.size() == 0 )
-    {
-        this->socket->write( SEQ_ID_IS_NULL );
-        return std::make_pair( true, "NULL" );
-    }
-
-    return std::make_pair( false, seqId );
-}
+// Actions
 
 void Application::LoginUserAction( QJsonObject params )
 {
@@ -287,6 +280,24 @@ void Application::CreateConversationAction( QJsonObject params )
         this->socket->write( USER_NOT_AUTHORIZE );
         return;
     }
+
+    auto seqId = this->CheckSeqId( params );
+
+    if ( seqId.first )
+    {
+        return;
+    }
+
+    QString user_two = params["friend_id"].toString();
+
+    if ( user_two.size() == 0 )
+    {
+        this->socket->write( FRIEND_ID_IS_NULL );
+        return;
+    }
+
+    this->InsertConversation( user_id, user_two );
+    this->SendOk( seqId.second );
 }
 
 void Application::SendMessageAction( QJsonObject params )
@@ -298,12 +309,33 @@ void Application::SendMessageAction( QJsonObject params )
         this->socket->write( USER_NOT_AUTHORIZE );
         return;
     }
+
+    auto seqId = this->CheckSeqId( params );
+
+    if ( seqId.first )
+    {
+        return;
+    }
+
+    QString conversation_id = params["conversation_id"].toString();
+    if ( conversation_id.size() == 0 )
+    {
+        this->socket->write( CONVERSATION_ID_IS_NULL );
+        return;
+    }
+
+    QString message = params["message"].toString();
+
+    if ( message.size() == 0)
+    {
+        this->socket->write( MESSAGE_IS_NULL );
+    }
+
+    this->InsertMessage(conversation_id, user_id, message );
+    this->SendOk( seqId.second );
 }
 
-void Application::SendOk( QString seqId )
-{
-    this->socket->write( QString("{ \"seqId\" : \"" + seqId + "\", \"msg\": \"OK\" }").toUtf8() );
-}
+// Execute sql
 
 void Application::InsertUser( User user )
 {
@@ -448,6 +480,21 @@ QJsonArray Application::GetMessages( QString conversation_id )
     return array;
 }
 
+// System
+
+std::pair<bool, QString> Application::CheckSeqId ( QJsonObject params )
+{
+    QString seqId = params["seqId"].toString();
+
+    if ( seqId.size() == 0 )
+    {
+        this->socket->write( SEQ_ID_IS_NULL );
+        return std::make_pair( true, "NULL" );
+    }
+
+    return std::make_pair( false, seqId );
+}
+
 QString Application::randString(int len)
 {
     QString str;
@@ -458,4 +505,9 @@ QString Application::randString(int len)
         str[s] = QChar('A' + char(qrand() % ('Z' - 'A')));
 
     return str;
+}
+
+void Application::SendOk( QString seqId )
+{
+    this->socket->write( QString("{ \"seqId\" : \"" + seqId + "\", \"msg\": \"OK\" }").toUtf8() );
 }

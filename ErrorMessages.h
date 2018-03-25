@@ -6,3 +6,5 @@
 #define PASSWORD_NOT_VALID "{ \"error\": \"Password is not valid\" }"
 #define USER_NOT_AUTHORIZE "{ \"error\": \"User not authorize!\" }"
 #define CONVERSATION_ID_IS_NULL "{ \"error\": \"Conversation id is null!\" }"
+#define FRIEND_ID_IS_NULL "{ \"error\": \"Friend id is null!\" }"
+#define MESSAGE_IS_NULL "{ \"error\": \"Message id is null!\" }"
