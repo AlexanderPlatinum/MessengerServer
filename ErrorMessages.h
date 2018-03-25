@@ -4,3 +4,5 @@
 #define SEQ_ID_IS_NULL "{ \"error\": \"Sequence id not found or null\" }"
 #define EMAIL_NOT_VALID "{ \"error\": \"Email is not valid\" }"
 #define PASSWORD_NOT_VALID "{ \"error\": \"Password is not valid\" }"
+#define USER_NOT_AUTHORIZE "{ \"error\": \"User not authorize!\" }"
+#define CONVERSATION_ID_IS_NULL "{ \"error\": \"Conversation id is null!\" }"

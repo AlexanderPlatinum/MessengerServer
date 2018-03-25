@@ -184,7 +184,6 @@ void Application::LoginUserAction( QJsonObject params )
 void Application::RegisterUserAction( QJsonObject params )
 {
     auto seqId = this->CheckSeqId( params );
-
     if ( seqId.first )
     {
         return;
@@ -219,10 +218,27 @@ void Application::GetConversationsAction( QJsonObject params )
 
     if ( user_id.size() == 0 )
     {
+        this->socket->write( USER_NOT_AUTHORIZE );
         return;
     }
 
+    auto seqId = this->CheckSeqId( params );
 
+    if ( seqId.first )
+    {
+        return;
+    }
+
+    QJsonArray conversations = this->GetConversations( user_id );
+
+    QJsonObject *obj = new QJsonObject();
+
+    obj->insert( "seqId", seqId.second );
+    obj->insert( "msg", "OK" );
+    obj->insert( "response", QJsonValue( conversations ) );
+
+    QJsonDocument *doc = new QJsonDocument( *obj );
+    this->socket->write( doc->toJson() );
 }
 
 void Application::GetMessagesAction( QJsonObject params )
@@ -231,8 +247,35 @@ void Application::GetMessagesAction( QJsonObject params )
 
     if ( user_id.size() == 0 )
     {
+        this->socket->write( USER_NOT_AUTHORIZE );
         return;
     }
+
+    auto seqId = this->CheckSeqId( params );
+
+    if ( seqId.first )
+    {
+        return;
+    }
+
+    QString conversation_id = params["conversation_id"].toString();
+
+    if ( conversation_id.size() == 0 )
+    {
+        this->socket->write( CONVERSATION_ID_IS_NULL );
+        return;
+    }
+
+    QJsonArray messages = this->GetMessages( conversation_id );
+
+    QJsonObject *obj = new QJsonObject();
+
+    obj->insert( "seqId", seqId.second );
+    obj->insert( "msg", "OK" );
+    obj->insert( "response", QJsonValue( messages ) );
+
+    QJsonDocument *doc = new QJsonDocument( *obj );
+    this->socket->write( doc->toJson() );
 }
 
 void Application::CreateConversationAction( QJsonObject params )
@@ -241,6 +284,7 @@ void Application::CreateConversationAction( QJsonObject params )
 
     if ( user_id.size() == 0 )
     {
+        this->socket->write( USER_NOT_AUTHORIZE );
         return;
     }
 }
@@ -251,6 +295,7 @@ void Application::SendMessageAction( QJsonObject params )
 
     if ( user_id.size() == 0 )
     {
+        this->socket->write( USER_NOT_AUTHORIZE );
         return;
     }
 }
@@ -351,7 +396,7 @@ void Application::InsertMessage( QString conversation_id, QString author_id, QSt
     query.exec();
 }
 
-QString Application::GetConversations( QString user_id )
+QJsonArray Application::GetConversations( QString user_id )
 {
     QSqlQuery query;
 
@@ -375,12 +420,10 @@ QString Application::GetConversations( QString user_id )
         array.push_back( QJsonValue( obj ) );
     }
 
-    QJsonDocument doc ( array );
-
-    return doc.toJson();
+    return array;
 }
 
-QString Application::GetMessages( QString conversation_id )
+QJsonArray Application::GetMessages( QString conversation_id )
 {
     QSqlQuery query;
 
@@ -402,9 +445,7 @@ QString Application::GetMessages( QString conversation_id )
         array.push_back( QJsonValue( obj ) );
     }
 
-    QJsonDocument doc( array );
-
-    return doc.toJson();
+    return array;
 }
 
 QString Application::randString(int len)

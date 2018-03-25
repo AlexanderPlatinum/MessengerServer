@@ -74,8 +74,8 @@ private:
     QString GetUserByEmailAndPass ( User user );
     QString InsertSession( QString user_id );
     QString GetUserIdByToken( QString token );
-    QString GetConversations( QString user_id );
-    QString GetMessages( QString conversation_id );
+    QJsonArray GetConversations( QString user_id );
+    QJsonArray GetMessages( QString conversation_id );
 
     // Utilities
     std::pair<bool, QString> CheckSeqId ( QJsonObject params );
