@@ -1,5 +1,15 @@
 #pragma once
 
+#include <QString>
+
+struct User {
+    int id;
+    QString first_name;
+    QString last_name;
+    QString email;
+    QString password;
+};
+
 #define INSERT_USER_SQL "INSERT INTO users ( first_name, last_name, email, password ) VALUES ( :first_name, :last_name, :email, :password );"
 #define GET_USER_ID_BY_EMAIL_PASS "SELECT id FROM users WHERE password = :password AND email = :email;"
 #define GET_USERS_SQL " SELECT id, first_name, last_name FROM users;"

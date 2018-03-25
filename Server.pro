@@ -8,12 +8,18 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     Main.cpp \
-    Application.cpp
+    Application.cpp \
+    Database.cpp \
+    Actions.cpp \
+    Utilities.cpp
 
 HEADERS += \
     SQLCommands.h \
     Application.h \
-    ErrorMessages.h
+    ErrorMessages.h \
+    Database.h \
+    Actions.h \
+    Utilities.h
 
 DISTFILES += \
     db.sql

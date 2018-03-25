@@ -11,29 +11,11 @@
 #include <iostream>
 #include <utility>
 
+#include "Actions.h"
+
 #include "SQLCommands.h"
 #include "ErrorMessages.h"
 
-enum Actions {
-
-    LoginUser,
-    RegisterUser,
-    GetConversations,
-    GetMessages,
-    CreateConversation,
-    SendMessage,
-    GetUsers,
-    NotFound
-
-};
-
-struct User {
-    int id;
-    QString first_name;
-    QString last_name;
-    QString email;
-    QString password;
-};
 
 class Application : public QObject
 {
@@ -55,35 +37,9 @@ private:
     void SetUpTCPServer();
 
     // Common
-    Actions ParseAction( QString command );
+    ActionsEnum ParseAction( QString command );
     std::pair<QString, QJsonObject> ParseCommand ( QString command );
     void ExecActions( QByteArray data );
-
-    // Actions
-    void LoginUserAction ( QJsonObject params );
-    void RegisterUserAction( QJsonObject params );
-    void GetConversationsAction( QJsonObject params );
-    void GetMessagesAction( QJsonObject params );
-    void CreateConversationAction( QJsonObject params );
-    void SendMessageAction( QJsonObject params );
-    void GetUsersAction( QJsonObject params );
-
-    // Execute sql
-    void InsertUser( User user );
-    void InsertConversation ( QString user_one, QString user_two );
-    void InsertMessage( QString conversation_id, QString author_id, QString message );
-
-    QString GetUserByEmailAndPass ( User user );
-    QString InsertSession( QString user_id );
-    QString GetUserIdByToken( QString token );
-    QJsonArray GetConversations( QString user_id );
-    QJsonArray GetMessages( QString conversation_id );
-    QJsonArray GetAllUsers();
-
-    // Utilities
-    std::pair<bool, QString> CheckSeqId ( QJsonObject params );
-    void SendOk ( QString seqId );
-    QString randString(int len);
 
 private slots:
 
