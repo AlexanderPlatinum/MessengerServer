@@ -23,6 +23,7 @@ void Actions::LoginUserAction( QTcpSocket *socket, QJsonObject params )
 
     if ( user_id.size() == 0 )
     {
+        Utilities::SendOk( socket, seqId.second );
         return;
     }
 

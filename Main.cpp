@@ -6,8 +6,8 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    Application *app = new Application();
-    app->Run();
+    Application app;
+    app.run();
 
     return a.exec();
 }

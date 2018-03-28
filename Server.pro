@@ -11,7 +11,8 @@ SOURCES += \
     Application.cpp \
     Database.cpp \
     Actions.cpp \
-    Utilities.cpp
+    Utilities.cpp \
+    SocketThread.cpp
 
 HEADERS += \
     SQLCommands.h \
@@ -19,7 +20,8 @@ HEADERS += \
     ErrorMessages.h \
     Database.h \
     Actions.h \
-    Utilities.h
+    Utilities.h \
+    SocketThread.h
 
 DISTFILES += \
     db.sql

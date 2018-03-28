@@ -68,10 +68,10 @@ INSERT INTO messages ( conversation_id, author_id, msg_text ) VALUES ( :conversa
 
 SELECT
     c.id,
-    u_one.first_name as u_one_first_name,
-    u_one.last_name as u_one_last_name,
-    u_two.first_name as u_two_first_name,
-    u_two.last_name as u_two_last_name
+    u_one.first_name AS u_one_first_name,
+    u_one.last_name AS u_one_last_name,
+    u_two.first_name AS u_two_first_name,
+    u_two.last_name AS u_two_last_name
 FROM
     conversations AS c
 LEFT JOIN
