@@ -33,10 +33,33 @@ QString Database::GetUserByEmailAndPass( User user )
     return "";
 }
 
+User Database::GetUserById( QString user_id )
+{
+    QSqlQuery query;
+
+    query.prepare( GET_USER_BY_ID );
+
+    query.bindValue( ":user_id", user_id );
+
+    query.exec();
+
+    User user;
+
+    while ( query.next() )
+    {
+        user.id = query.value("id").toInt();
+        user.first_name = query.value("first_name").toString();
+        user.last_name  = query.value("last_name").toString();
+    }
+
+    return user;
+}
+
 QString Database::InsertSession( QString user_id )
 {
 
     QString token = Utilities::randString( 45 );
+
     QSqlQuery query;
 
     query.prepare( INSERT_SESSION_SQL );

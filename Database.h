@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QSql>
+//#include <QSql>
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QJsonObject>
@@ -21,6 +21,7 @@ public:
     static void InsertMessage( QString conversation_id, QString author_id, QString message );
 
     static QString GetUserByEmailAndPass ( User user );
+    static User GetUserById( QString user_id );
     static QString InsertSession( QString user_id );
     static QString GetUserIdByToken( QString token );
     static QJsonArray GetConversations( QString user_id );

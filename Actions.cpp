@@ -27,6 +27,8 @@ void Actions::LoginUserAction( QTcpSocket *socket, QJsonObject params )
         return;
     }
 
+    User tmp = Database::GetUserById( user_id );
+
     QString token = Database::InsertSession( user_id );
 
     QJsonObject *obj = new QJsonObject();
@@ -34,6 +36,9 @@ void Actions::LoginUserAction( QTcpSocket *socket, QJsonObject params )
     obj->insert( "seqId", seqId.second );
     obj->insert( "msg", "OK" );
     obj->insert( "token", token );
+    obj->insert( "user_id", QString::number(tmp.id) );
+    obj->insert( "first_name", tmp.first_name );
+    obj->insert( "last_name", tmp.last_name );
 
     QJsonDocument *doc = new QJsonDocument( *obj );
     socket->write( doc->toJson() );

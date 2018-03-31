@@ -2,12 +2,14 @@
 
 QString Utilities::randString(int len)
 {
-    QString str;
 
+    srand( time( 0 ) );
+
+    QString str;
     str.resize(len);
 
     for (int s = 0; s < len ; ++s)
-        str[s] = QChar('A' + char(qrand() % ('Z' - 'A')));
+        str[s] = QChar('A' + char( rand() % ('z' - 'A')));
 
     return str;
 }

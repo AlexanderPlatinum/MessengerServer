@@ -4,6 +4,7 @@
 #include <QJsonObject>
 #include <QTcpSocket>
 #include <utility>
+#include <ctime>
 
 #include "ErrorMessages.h"
 

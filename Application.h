@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QSql>
+//#include <QSql>
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QTcpServer>
